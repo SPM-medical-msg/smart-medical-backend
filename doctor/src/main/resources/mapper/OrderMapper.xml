@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xxx.modules.mapper.OrderMapper">
+
+<select id="selectListInfo" resultType="com.xxx.modules.entity.Order">
+select `o`.*,u.real_name, d.real_name as doctor_real_name, dd.dept_name from `order` o   left join `user` u on o.user_id = u.id
+   left join `user` d on o.doctor_user_id = d.id
+   left join `dept` dd on o.dept_id = dd.id
+   where 1=1
+    <if test="userId !=null">
+        and o.user_id = #{userId}
+    </if>
+    <if test="doctorUserId !=null">
+        and o.doctor_user_id = #{doctorUserId}
+    </if>
+    <if test="orderNumber !=null">
+        and o.order_number = #{orderNumber}
+    </if>
+    <if test="time !=null">
+        and o.time = #{time}
+    </if>
+    <if test="status !=null">
+        and o.status = #{status}
+    </if>
+    <if test="deptId !=null">
+        and o.dept_id = #{deptId}
+    </if>
+    <if test="realName !=null">
+        and u.real_name like concat('%',#{realName},'%')
+    </if>
+            <if test="doctorRealName !=null">
+        and d.real_name like concat('%',#{doctorRealName},'%')
+    </if>
+            <if test="deptName !=null">
+        and dd.dept_name like concat('%',#{deptName},'%')
+    </if>
+        </select>
+
+
+    <select id="selectTotalCount" resultType="java.lang.Integer">
+        select COUNT(*) from `order`
+        where 1=1
+        <if test="year !=null">
+            and `year`  = #{year}
+        </if>
+        <if test="month !=null">
+            and `month`  = #{month}
+        </if>
+        <if test="day !=null">
+            and `day`  = #{day}
+        </if>
+    </select>
+    <select id="selectTotalPrice" resultType="java.lang.Double">
+        select SUM(price) from `order`
+        where 1=1
+        <if test="year !=null">
+            and `year`  = #{year}
+        </if>
+        <if test="month !=null">
+            and `month`  = #{month}
+        </if>
+        <if test="day !=null">
+            and `day`  = #{day}
+        </if>
+    </select>
+    <select id="selectDistinctUserId" resultType="java.lang.Integer">
+        select distinct user_id from `order`
+    </select>
+</mapper>

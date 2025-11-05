@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xxx.modules.mapper.AlarmMapper">
+
+<select id="selectListInfo" resultType="com.xxx.modules.entity.Alarm">
+select `a`.*,d.drug_name from `alarm` a   left join `drug` d on a.drug_id = d.id
+   where 1=1
+   <if test="id !=null">
+       and `a`.id = #{id}
+   </if>
+    <if test="drugId !=null">
+        and a.drug_id = #{drugId}
+    </if>
+    <if test="status !=null">
+        and a.status = #{status}
+    </if>
+    <if test="drugName !=null">
+        and d.drug_name like concat('%',#{drugName},'%')
+    </if>
+    order by `a`.create_time desc
+</select>
+
+
+</mapper>

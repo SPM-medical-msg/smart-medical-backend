@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xxx.modules.mapper.EvaluateMapper">
+
+<select id="selectListInfo" resultType="com.xxx.modules.entity.Evaluate">
+select `e`.*,u.real_name,u.image_url, ud.real_name as doctor_real_name from `evaluate` e   left join `user` u on e.user_id = u.id
+   left join `user` ud on e.doctor_user_id = ud.id
+   where 1=1
+   <if test="id !=null">
+       and `e`.id = #{id}
+   </if>
+    <if test="userId !=null">
+        and e.user_id = #{userId}
+    </if>
+    <if test="doctorUserId !=null">
+        and e.doctor_user_id = #{doctorUserId}
+    </if>
+    <if test="realName !=null">
+        and u.real_name like concat('%',#{realName},'%')
+    </if>
+        <if test="doctorRealName !=null">
+        and ud.real_name like concat('%',#{doctorRealName},'%')
+    </if>
+    order by `e`.create_time desc
+</select>
+    <select id="selectAvgScore" resultType="java.lang.Double">
+        select AVG(score) from evaluate where doctor_user_id = #{userId}
+    </select>
+
+
+</mapper>

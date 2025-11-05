@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xxx.modules.mapper.DiagnoseMapper">
+
+<select id="selectListInfo" resultType="com.xxx.modules.entity.Diagnose">
+select `d`.*,ud.real_name as doctor_real_name, u.real_name, o.order_number, dd.drug_name from `diagnose` d   left join `user` ud on d.doctor_user_id = ud.id
+   left join `user` u on d.user_id = u.id
+   left join `order` o on d.order_id = o.id
+   left join `drug` dd on d.drug_id = dd.id
+   where 1=1
+    <if test="doctorUserId !=null">
+        and d.doctor_user_id = #{doctorUserId}
+    </if>
+    <if test="userId !=null">
+        and d.user_id = #{userId}
+    </if>
+    <if test="orderId !=null">
+        and d.order_id = #{orderId}
+    </if>
+    <if test="drugId !=null">
+        and d.drug_id = #{drugId}
+    </if>
+    <if test="doctorRealName !=null">
+        and ud.real_name like concat('%',#{doctorRealName},'%')
+    </if>
+            <if test="realName !=null">
+        and u.real_name like concat('%',#{realName},'%')
+    </if>
+            <if test="orderNumber !=null">
+        and o.order_number like concat('%',#{orderNumber},'%')
+    </if>
+            <if test="drugName !=null">
+        and dd.drug_name like concat('%',#{drugName},'%')
+    </if>
+        </select>
+
+
+</mapper>

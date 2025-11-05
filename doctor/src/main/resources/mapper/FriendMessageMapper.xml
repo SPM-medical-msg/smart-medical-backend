@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xxx.modules.mapper.FriendMessageMapper">
+
+<select id="selectListInfo" resultType="com.xxx.modules.entity.FriendMessage">
+select `f`.*,us.real_name as send_real_name, us.image_url, ur.real_name as receive_real_name from `friend_message` f   left join `user` us on f.send_user_id = us.id
+   left join `user` ur on f.receive_user_id = ur.id
+   where 1=1
+    <if test="sendUserId !=null">
+        and f.send_user_id = #{sendUserId}
+    </if>
+    <if test="receiveUserId !=null">
+        and f.receive_user_id = #{receiveUserId}
+    </if>
+    <if test="type !=null">
+        and f.type = #{type}
+    </if>
+    <if test="status !=null">
+        and f.status = #{status}
+    </if>
+    <if test="sendRealName !=null">
+        and us.real_name like concat('%',#{sendRealName},'%')
+    </if>
+            <if test="receiveRealName !=null">
+        and ur.real_name like concat('%',#{receiveRealName},'%')
+    </if>
+    order by f.create_time desc
+        </select>
+    <select id="selectMessageList" resultType="com.xxx.modules.entity.FriendMessage">
+        select `f`.*,us.real_name as send_real_name, us.image_url,ur.real_name as receive_real_name from `friend_message` f   left join `user` us on f.send_user_id = us.id
+         left join `user` ur on f.receive_user_id = ur.id where 1=1
+         and (send_user_id = #{sendUserId} and receive_user_id = #{receiveUserId})
+         or (send_user_id = #{receiveUserId} and receive_user_id = #{sendUserId})
+    </select>
+
+</mapper>
