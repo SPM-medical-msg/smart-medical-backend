@@ -78,3 +78,9 @@ logs/
 # IP2Region data (if needed)
 # ip2region.xdb
 
+# 文档和脚本（不提交到GitHub）
+*.md
+*.sh
+README*
+GitHub*
+doctor/HELP.md
