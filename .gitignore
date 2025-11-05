@@ -84,3 +84,6 @@ logs/
 README*
 GitHub*
 doctor/HELP.md
+
+# Spring Boot banner（可选，装饰用）
+doctor/src/main/resources/banner.txt
