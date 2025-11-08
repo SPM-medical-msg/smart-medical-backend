@@ -13,6 +13,7 @@ import springfox.documentation.annotations.ApiIgnore;
 import com.github.pagehelper.PageInfo;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import com.xxx.modules.utils.Result;
@@ -158,7 +159,43 @@ public class UserController {
         }
         return ResultUtil.success(1,"正常",null);
     }
+    @GetMapping("/getUserByPhone")
+    @ApiOperation("根据手机号查询用户信息")
+    public Map<String, Object> getUserByPhone(@RequestParam String phone) {
 
+        Map<String, Object> result = new HashMap<>();
+
+        // 参数验证
+        if (phone == null || phone.trim().isEmpty()) {
+            result.put("code", 400);
+            result.put("message", "手机号不能为空");
+            return result;
+        }
+
+        try {
+            // 直接写SQL查询
+            String sql = "SELECT * FROM user WHERE phone = ?";
+            List<Map<String, Object>> users = jdbcTemplate.queryForList(sql, phone);
+
+            if (users.size() > 0) {
+                // 找到用户
+                result.put("code", 200);
+                result.put("message", "查询成功");
+                result.put("data", users.get(0));
+            } else {
+                // 没有找到用户
+                result.put("code", 404);
+                result.put("message", "没有找到该手机号对应的用户信息");
+                result.put("data", null);
+            }
+
+        } catch (Exception e) {
+            result.put("code", 500);
+            result.put("message", "查询失败：" + e.getMessage());
+        }
+
+        return result;
+    }
 
 
 }
