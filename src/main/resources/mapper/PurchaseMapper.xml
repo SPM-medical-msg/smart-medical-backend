@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xxx.modules.mapper.PurchaseMapper">
+
+<select id="selectListInfo" resultType="com.xxx.modules.entity.Purchase">
+select `p`.*,d.drug_name, u.real_name from `purchase` p   left join `drug` d on p.drug_id = d.id
+   left join `user` u on p.user_id = u.id
+   where 1=1
+   <if test="id !=null">
+       and `p`.id = #{id}
+   </if>
+    <if test="orderNumber !=null">
+        and  p.order_number like concat('%',#{orderNumber},'%')
+    </if>
+    <if test="title !=null">
+        and  p.title like concat('%',#{title},'%')
+    </if>
+    <if test="drugId !=null">
+        and p.drug_id = #{drugId}
+    </if>
+    <if test="status !=null">
+        and p.status = #{status}
+    </if>
+    <if test="userId !=null">
+        and p.user_id = #{userId}
+    </if>
+    <if test="drugName !=null">
+        and d.drug_name like concat('%',#{drugName},'%')
+    </if>
+        <if test="realName !=null">
+        and u.real_name like concat('%',#{realName},'%')
+    </if>
+    order by `p`.create_time desc
+</select>
+
+
+</mapper>
