@@ -239,5 +239,23 @@ public class TimeUtil {
         String[] weekDays = {"星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"};
         return weekDays[date.getDayOfWeek().getValue() - 1];
     }
+// 在TimeUtil类中添加
+    /**
+     * 获取当前是星期几（中文）
+     * @return 星期一到星期日
+     */
+    public static String getCurrentWeekDayInChinese() {
+        int weekDayNum = getCurrentWeekDay(); // 使用已有方法
+        String[] weekDays = {"星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"};
+        return weekDays[weekDayNum - 1];
+    }
 
+    /**
+     * 获取当前小时
+     * @return 0-23
+     */
+    public static int getCurrentHour() {
+        Calendar calendar = Calendar.getInstance();
+        return calendar.get(Calendar.HOUR_OF_DAY);
+    }
 }
