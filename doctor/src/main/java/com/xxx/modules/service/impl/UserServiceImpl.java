@@ -32,10 +32,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private UserMapper userMapper;
 
     /**
-    * 登录接口(根据用户名和密码)
-    * @param user
-    * @return
-    */
+     * 登录接口(根据用户名和密码)
+     * @param user
+     * @return
+     */
     @Override
     public Result<?> login(User user) {
         QueryWrapper<User> wrapper = new QueryWrapper<>();
@@ -88,7 +88,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             Double avgScore = evaluateMapper.selectAvgScore(user1.getId());
             user1.setScore(avgScore == null?0:avgScore);
         }
-       return ResultUtil.success(1,"成功",new PageInfo<>(data));
+        return ResultUtil.success(1,"成功",new PageInfo<>(data));
     }
 
     @Autowired
@@ -102,7 +102,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public Result<?> selectUserInfo(Integer id) {
         User user = userMapper.selectById(id);
-        return ResultUtil.success(1,"成功",user);
+        if (user != null) {
+            Double avgScore = evaluateMapper.selectAvgScore(user.getId());
+            user.setScore(avgScore == null ? 0 : avgScore);
+        }
+        return ResultUtil.success(1, "成功", user);
     }
 
     /**
@@ -123,7 +127,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         user.setUpdateTime(TimeUtil.getCurrentTime());
         userMapper.insert(user);
         return ResultUtil.success(1,"成功",null);
-}
+    }
 
     /**
      * 更新用户接口实现类

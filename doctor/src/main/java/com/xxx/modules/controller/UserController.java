@@ -37,17 +37,17 @@ public class UserController {
     private UserService userService;
 
     /**
-    *  获取所有用户
-    * @param pageNum
-    * @param pageSize
-    * @param user
-    * @return
-    */
+     *  获取所有用户
+     * @param pageNum
+     * @param pageSize
+     * @param user
+     * @return
+     */
 
     @GetMapping("/getUserList")
     @ApiOperation("获取所有用户")
     public Result<?> getUserList(User user, @RequestParam(value="pageNum",defaultValue = "1") Integer pageNum,
-                                      @RequestParam(value="pageSize",defaultValue = "10") Integer pageSize){
+                                 @RequestParam(value="pageSize",defaultValue = "10") Integer pageSize){
         return userService.selectUserList(user,pageNum,pageSize);
     }
 
@@ -58,11 +58,12 @@ public class UserController {
         return userService.selectUserInfo(id);
     }
 
+
     /**
-    * 保存用户
-    * @param user
-    * @return
-    */
+     * 保存用户
+     * @param user
+     * @return
+     */
     @PostMapping("/saveUserInfo")
     @ApiOperation("保存用户")
     public Result<?> saveUserInfo(@RequestBody User user){
@@ -119,14 +120,14 @@ public class UserController {
 
 
     /**
-    *
-    * @param user
-    * @return
+     *
+     * @param user
+     * @return
      */
     @PostMapping("/updatePassword")
     @ApiOperation("用户更新密码接口")
     public Result<?> updatePassword(@RequestBody User user){
-       return userService.updatePassword(user);
+        return userService.updatePassword(user);
     }
 
 
@@ -159,6 +160,7 @@ public class UserController {
         }
         return ResultUtil.success(1,"正常",null);
     }
+
     @GetMapping("/getUserByPhone")
     @ApiOperation("根据手机号查询用户信息")
     public Map<String, Object> getUserByPhone(@RequestParam String phone) {
@@ -196,6 +198,5 @@ public class UserController {
 
         return result;
     }
-
 
 }

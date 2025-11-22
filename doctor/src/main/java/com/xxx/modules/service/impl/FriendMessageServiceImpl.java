@@ -41,7 +41,7 @@ public class FriendMessageServiceImpl extends ServiceImpl<FriendMessageMapper, F
         PageHelper.startPage(pageNum,pageSize);
 
         List<FriendMessage> data = friendMessageMapper.selectListInfo(friendMessage);
-       return ResultUtil.success(1,"成功",new PageInfo<>(data));
+        return ResultUtil.success(1,"成功",new PageInfo<>(data));
     }
 
 
@@ -51,15 +51,28 @@ public class FriendMessageServiceImpl extends ServiceImpl<FriendMessageMapper, F
      * @return
      */
     @Override
-    public Result selectFriendMessageInfo(FriendMessage friendMessage,Integer pageNum,Integer pageSize) {
-        PageHelper.startPage(pageNum,pageSize);
-        LambdaQueryWrapper<FriendMessage> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(FriendMessage::getSendUserId,friendMessage.getReceiveUserId()).eq(FriendMessage::getReceiveUserId,friendMessage.getSendUserId());
+    public Result selectFriendMessageInfo(FriendMessage friendMessage, Integer pageNum, Integer pageSize) {
+        PageHelper.startPage(pageNum, pageSize);
+
+        // 构建更新已读状态的条件
+        LambdaQueryWrapper<FriendMessage> updateWrapper = new LambdaQueryWrapper<>();
+        updateWrapper.eq(FriendMessage::getSendUserId, friendMessage.getReceiveUserId())
+                .eq(FriendMessage::getReceiveUserId, friendMessage.getSendUserId());
+
+        // 如果传入了StrategyId，添加到更新条件中
+        if (friendMessage.getStrategyId() != null) {
+            updateWrapper.eq(FriendMessage::getStrategyId, friendMessage.getStrategyId());
+        }
+
+        // 更新消息为已读
         FriendMessage newFriendMessage = new FriendMessage();
         newFriendMessage.setIsView(2);
-        friendMessageMapper.update(newFriendMessage,wrapper);
+        friendMessageMapper.update(newFriendMessage, updateWrapper);
+
+        // 查询消息列表（这里假设selectMessageList方法会处理StrategyId）
         List<FriendMessage> friendMessageList = friendMessageMapper.selectMessageList(friendMessage);
-        return ResultUtil.success(1,"成功",new PageInfo<>(friendMessageList));
+
+        return ResultUtil.success(1, "成功", new PageInfo<>(friendMessageList));
     }
 
     /**
@@ -73,7 +86,7 @@ public class FriendMessageServiceImpl extends ServiceImpl<FriendMessageMapper, F
         friendMessage.setUpdateTime(TimeUtil.getCurrentTime());
         friendMessageMapper.insert(friendMessage);
         return ResultUtil.success(1,"成功",null);
-}
+    }
 
     /**
      * 更新好友消息接口实现类

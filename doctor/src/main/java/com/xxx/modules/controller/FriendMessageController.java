@@ -27,17 +27,17 @@ public class FriendMessageController {
     private FriendMessageService friendMessageService;
 
     /**
-    *  获取所有好友消息
-    * @param pageNum
-    * @param pageSize
-    * @param friendMessage
-    * @return
-    */
+     *  获取所有好友消息
+     * @param pageNum
+     * @param pageSize
+     * @param friendMessage
+     * @return
+     */
 
     @GetMapping("/getFriendMessageList")
     @ApiOperation("获取所有好友消息")
     public Result getFriendMessageList(FriendMessage friendMessage, @RequestParam(value="pageNum",defaultValue = "1") Integer pageNum,
-                                      @RequestParam(value="pageSize",defaultValue = "10") Integer pageSize){
+                                       @RequestParam(value="pageSize",defaultValue = "10") Integer pageSize){
         return friendMessageService.selectFriendMessageList(friendMessage,pageNum,pageSize);
     }
 
@@ -50,10 +50,10 @@ public class FriendMessageController {
     }
 
     /**
-    * 保存好友消息
-    * @param friendMessage
-    * @return
-    */
+     * 保存好友消息
+     * @param friendMessage
+     * @return
+     */
     @PostMapping("/saveFriendMessageInfo")
     @ApiOperation("保存好友消息")
     public Result saveFriendMessageInfo(@RequestBody FriendMessage friendMessage){
@@ -99,11 +99,11 @@ public class FriendMessageController {
 
 
 
-        /**
-         * 导出
-         * @param friendMessage
-         * @return
-         */
+    /**
+     * 导出
+     * @param friendMessage
+     * @return
+     */
     @PostMapping("/exportFriendMessageExcel")
     public void export(HttpServletResponse response, FriendMessage friendMessage) {
         try{
