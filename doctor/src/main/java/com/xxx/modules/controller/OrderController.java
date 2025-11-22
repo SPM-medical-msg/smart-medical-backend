@@ -37,17 +37,17 @@ public class OrderController {
     private OrderService orderService;
 
     /**
-    *  获取所有挂号
-    * @param pageNum
-    * @param pageSize
-    * @param order
-    * @return
-    */
+     *  获取所有挂号
+     * @param pageNum
+     * @param pageSize
+     * @param order
+     * @return
+     */
 
     @GetMapping("/getOrderList")
     @ApiOperation("获取所有挂号")
     public Result<?> getOrderList(Order order, @RequestParam(value="pageNum",defaultValue = "1") Integer pageNum,
-                                      @RequestParam(value="pageSize",defaultValue = "10") Integer pageSize){
+                                  @RequestParam(value="pageSize",defaultValue = "10") Integer pageSize){
         return orderService.selectOrderList(order,pageNum,pageSize);
     }
 
@@ -59,10 +59,10 @@ public class OrderController {
     }
 
     /**
-    * 保存挂号
-    * @param order
-    * @return
-    */
+     * 保存挂号
+     * @param order
+     * @return
+     */
     @PostMapping("/saveOrderInfo")
     @ApiOperation("保存挂号")
     public Result<?> saveOrderInfo(@RequestBody Order order){
@@ -127,11 +127,11 @@ public class OrderController {
     }
 
 
-        /**
-         * 导出
-         * @param order
-         * @return
-         */
+    /**
+     * 导出
+     * @param order
+     * @return
+     */
     @PostMapping("/exportOrderExcel")
     public void export(HttpServletResponse response, Order order) {
         try{
