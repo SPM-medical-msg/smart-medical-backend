@@ -43,6 +43,8 @@ public interface OrderService extends IService<Order>{
      */
     Result<?> updateOrderInfo(Order order);
 
+    Result<?> updateOrderStatus(Integer orderId, Integer status);
+
     /**
      * 根据id删除挂号接口
      * @param id
@@ -62,13 +64,13 @@ public interface OrderService extends IService<Order>{
     Result<?> payOrderInfo(Order order);
 
 
-        /**
+    /**
      * 导出
      * @param order
      * @return
      */
     List<Order> selectExcel(Order order);
-    
-    
+
+
 
 }

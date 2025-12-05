@@ -1,15 +1,17 @@
 package com.xxx.modules.service.impl;
 import com.baomidou.mybatisplus.core.conditions.interfaces.Func;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.xxx.modules.mapper.OrderMapper;
+import com.xxx.modules.entity.Friend;
+import com.alibaba.fastjson.JSONObject;
+import com.xxx.modules.mapper.*;
 import com.xxx.modules.entity.Order;
-import com.xxx.modules.mapper.PlanMapper;
 import com.xxx.modules.service.OrderService;
 import com.xxx.modules.entity.User;
-import com.xxx.modules.mapper.UserMapper;
 import com.xxx.modules.utils.Result;
 import com.xxx.modules.utils.ResultUtil;
+import com.xxx.modules.mqtt.MqttGateway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.github.pagehelper.PageHelper;
@@ -34,8 +36,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
     @Autowired
     private OrderMapper orderMapper;
-
-
+    @Autowired
+    private FriendMapper friendMapper;
+    @Autowired
+    private FriendMessageMapper friendMessageMapper;
+    @Autowired
+    private MqttGateway mqttGateway;
 
     @Autowired
     private UserMapper userMapper;
@@ -46,23 +52,120 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     }
     @Override
     @Transactional
-    public Result<?> payOrderInfo(Order order){
+    public Result<?> payOrderInfo(Order order) {
         Order orderFromDb = orderMapper.selectById(order.getId());
-        if (orderFromDb.getStatus() == 2){
-            return ResultUtil.error(-1,"该订单已经支付");
+        if (orderFromDb.getStatus() == 2) {
+            return ResultUtil.error(-1, "该订单已经支付");
         }
+
         User user = userMapper.selectById(orderFromDb.getUserId());
         Double v = user.getMoney();
         Double totalPrice = orderFromDb.getPrice();
-        if (totalPrice > v){
-            return ResultUtil.error(-1,"余额不足");
+        if (totalPrice > v) {
+            return ResultUtil.error(-1, "余额不足");
         }
+
+        // 1. 更新订单状态
         orderFromDb.setStatus(2);
         orderMapper.updateById(orderFromDb);
+
+        // 2. 扣除用户余额
         user.setMoney(v - totalPrice);
         userMapper.updateById(user);
 
-        return ResultUtil.success(1,"正常",null);
+        // 3. 自动建立医患好友关系
+        Integer patientId = orderFromDb.getUserId();    // 患者ID
+        Integer doctorId = orderFromDb.getDoctorUserId();   // 医生ID（根据你的字段名调整）
+
+        // 检查是否已经是好友
+        if (!checkIsFriend(patientId, doctorId)) {
+            // 不是好友，自动建立双向好友关系
+            createFriendRelation(patientId, doctorId);
+
+            // 发送MQTT通知给医生：有新患者
+            User patient = userMapper.selectById(patientId);
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("msg", "您有新的患者咨询，患者：" + patient.getRealName());
+            jsonObject.put("type", "NEW_PATIENT");
+            jsonObject.put("patientId", patientId);
+            jsonObject.put("orderId", orderFromDb.getId());
+            mqttGateway.sendToMqtt("ADD/APPLY/" + doctorId, jsonObject.toString());
+        }
+
+        // 发送MQTT通知给患者：支付成功，可以开始咨询
+//        JSONObject patientNotify = new JSONObject();
+//        patientNotify.put("msg", "支付成功，咨询通道已建立");
+//        patientNotify.put("type", "PAY_SUCCESS");
+//        patientNotify.put("doctorId", doctorId);
+//        patientNotify.put("orderId", orderFromDb.getId());
+//        mqttGateway.sendToMqtt("PAY/SUCCESS/" + patientId, patientNotify.toString());
+
+        return ResultUtil.success(1, "支付成功", null);
+    }
+
+    /**
+     * 检查是否已经是好友关系
+     */
+    private boolean checkIsFriend(Integer userId1, Integer userId2) {
+        LambdaQueryWrapper<Friend> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Friend::getUserId, userId1)
+                .eq(Friend::getFriendId, userId2)
+                .eq(Friend::getStatus, 2);  // status=2 表示已是好友
+        Friend friend = friendMapper.selectOne(wrapper);
+        return friend != null;
+    }
+
+    /**
+     * 建立双向好友关系（直接是好友状态，无需申请）
+     */
+    private void createFriendRelation(Integer patientId, Integer doctorId) {
+        String currentTime = TimeUtil.getCurrentTime();
+
+        // 患者 -> 医生 的好友记录
+        LambdaQueryWrapper<Friend> wrapper1 = new LambdaQueryWrapper<>();
+        wrapper1.eq(Friend::getUserId, patientId).eq(Friend::getFriendId, doctorId);
+        Friend friend1 = friendMapper.selectOne(wrapper1);
+
+        if (friend1 == null) {
+            Friend newFriend1 = new Friend();
+            newFriend1.setUserId(patientId);
+            newFriend1.setFriendId(doctorId);
+            newFriend1.setStatus(2);  // 直接设为好友状态
+            newFriend1.setFriendType(2);  // 2表示医患关系（可选，用于区分）
+            newFriend1.setActiveAddUserId(patientId);
+            newFriend1.setAcceptAddUserId(doctorId);
+            newFriend1.setApplyMessage("于"+currentTime+"提交申请");
+            newFriend1.setCreateTime(currentTime);
+            newFriend1.setUpdateTime(currentTime);
+            friendMapper.insert(newFriend1);
+        } else {
+            friend1.setStatus(2);
+            friend1.setUpdateTime(currentTime);
+            friendMapper.updateById(friend1);
+        }
+
+        // 医生 -> 患者 的好友记录
+        LambdaQueryWrapper<Friend> wrapper2 = new LambdaQueryWrapper<>();
+        wrapper2.eq(Friend::getUserId, doctorId).eq(Friend::getFriendId, patientId);
+        Friend friend2 = friendMapper.selectOne(wrapper2);
+
+        if (friend2 == null) {
+            Friend newFriend2 = new Friend();
+            newFriend2.setUserId(doctorId);
+            newFriend2.setFriendId(patientId);
+            newFriend2.setStatus(2);  // 直接设为好友状态
+            newFriend2.setFriendType(2);  // 2表示医患关系
+            newFriend2.setActiveAddUserId(patientId);
+            newFriend2.setAcceptAddUserId(doctorId);
+            newFriend2.setApplyMessage("于"+currentTime+"提交申请");
+            newFriend2.setCreateTime(currentTime);
+            newFriend2.setUpdateTime(currentTime);
+            friendMapper.insert(newFriend2);
+        } else {
+            friend2.setStatus(2);
+            friend2.setUpdateTime(currentTime);
+            friendMapper.updateById(friend2);
+        }
     }
 
     /**

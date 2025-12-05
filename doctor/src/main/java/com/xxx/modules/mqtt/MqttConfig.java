@@ -90,7 +90,7 @@ public class MqttConfig {
     public MessageHandler createMqttOutbound() {
         String tempId = MqttAsyncClient.generateClientId();
         MyMqttPahoMessageHandler messageHandler = new MyMqttPahoMessageHandler(clientId + tempId,
-            mqttClientFactory());
+                mqttClientFactory());
         messageHandler.setAsync(true);
         messageHandler.setDefaultTopic(defaultTopic);
         messageHandler.setDefaultQos(0);
@@ -123,7 +123,7 @@ public class MqttConfig {
     public MessageProducer inbound() {
         //监听全部消息
         MyMqttPahoMessageDrivenChannelAdapter adapter = new MyMqttPahoMessageDrivenChannelAdapter(null,clientId ,
-            mqttClientFactory(),
+                mqttClientFactory(),
                 "CHAT/SRV000/#","CHAT/GROUP/#","LOGIN/CHAT/#");
         adapter.setCompletionTimeout(completionTimeout);
         adapter.setConverter(new DefaultPahoMessageConverter());
@@ -156,6 +156,7 @@ public class MqttConfig {
                     Integer sendUserId = jsonObject.getInteger("sendUserId");
                     Integer receiveUserId = jsonObject.getInteger("receiveUserId");
                     Integer type = jsonObject.getInteger("type");
+                    Integer strategyId = jsonObject.getInteger("strategyId");
                     String content = jsonObject.getString("content");
                     FriendMessage friendMessage = new FriendMessage();
                     friendMessage.setSendUserId(sendUserId);
@@ -168,7 +169,9 @@ public class MqttConfig {
                     friendMessage.setIsView(1);
                     friendMessage.setFileUrl(jsonObject.getString("fileUrl"));
                     friendMessage.setStrategyId(jsonObject.getInteger("strategyId"));
-
+                    if (strategyId != null) {
+                        friendMessage.setStrategyId(strategyId);
+                    }
                     friendMessageMapper.insert(friendMessage);
 
 
