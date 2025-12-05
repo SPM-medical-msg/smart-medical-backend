@@ -101,7 +101,33 @@ public class NoticeController {
         return noticeService.delBatchNoticeInfo(idList);
     }
 
+    /**
+     * 查询公告列表（支持科室筛选）- 新接口
+     */
+    @GetMapping("/getNoticeListWithDept")
+    public Result<?> getNoticeListWithDept(
+            @RequestParam(required = false) Integer deptId,
+            @RequestParam(required = false) String title,
+            @RequestParam(defaultValue = "1") Integer pageNum,
+            @RequestParam(defaultValue = "10") Integer pageSize) {
+        return noticeService.selectNoticeListWithDept(deptId, title, pageNum, pageSize);
+    }
 
+    /**
+     * 查询公告详情（包含科室名称）- 新接口
+     */
+    @GetMapping("/getNoticeInfoWithDept/{id}")
+    public Result<?> getNoticeInfoWithDept(@PathVariable Integer id) {
+        return noticeService.selectNoticeInfoWithDept(id);
+    }
+
+    /**
+     * 根据科室查询公告列表 - 新接口
+     */
+    @GetMapping("/getNoticeListByDeptId/{deptId}")
+    public Result<?> getNoticeListByDeptId(@PathVariable Integer deptId) {
+        return noticeService.selectNoticeListByDeptId(deptId);
+    }
 
 
 

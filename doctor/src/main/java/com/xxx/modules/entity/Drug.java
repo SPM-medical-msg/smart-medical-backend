@@ -81,5 +81,4 @@ public class Drug {
 	@TableField(exist = false)
 	@ApiModelProperty(value = "分类")
 	private String sortName;
-
 }

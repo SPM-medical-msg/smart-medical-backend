@@ -3,26 +3,30 @@
 
 <mapper namespace="com.xxx.modules.mapper.DrugMapper">
 
-<select id="selectListInfo" resultType="com.xxx.modules.entity.Drug">
-select `d`.*,s.sort_name from `drug` d   left join `sort` s on d.sort_id = s.id
-   where 1=1
-   <if test="id !=null">
-       and `d`.id = #{id}
-   </if>
-    <if test="drugName !=null">
-        and  d.drug_name like concat('%',#{drugName},'%')
-    </if>
-    <if test="sortId !=null">
-        and d.sort_id = #{sortId}
-    </if>
-    <if test="status !=null">
-        and d.status = #{status}
-    </if>
-    <if test="sortName !=null">
-        and s.sort_name like concat('%',#{sortName},'%')
-    </if>
-    order by `d`.create_time desc
-</select>
-
+    <select id="selectListInfo" resultType="com.xxx.modules.entity.Drug">
+        SELECT
+        d.*,
+        s.sort_name AS sortName
+        FROM `drug` d
+        LEFT JOIN `sort` s ON d.sort_id = s.id
+        <where>
+            <if test="id != null">
+                AND d.id = #{id}
+            </if>
+            <if test="drugName != null and drugName != ''">
+                AND d.drug_name LIKE CONCAT('%', #{drugName}, '%')
+            </if>
+            <if test="sortId != null">
+                AND d.sort_id = #{sortId}
+            </if>
+            <if test="status != null">
+                AND d.status = #{status}
+            </if>
+            <if test="sortName != null and sortName != ''">
+                AND s.sort_name LIKE CONCAT('%', #{sortName}, '%')
+            </if>
+        </where>
+        ORDER BY d.create_time DESC
+    </select>
 
 </mapper>

@@ -40,4 +40,10 @@ public class Sort {
 	@ApiModelProperty(value = "更新时间")
 	private String updateTime;
 
+	/**
+	 * 药品数量（不映射数据库字段）
+	 */
+	@TableField(exist = false)
+	@ApiModelProperty(value = "药品数量")
+	private Integer drugCount;
 }
