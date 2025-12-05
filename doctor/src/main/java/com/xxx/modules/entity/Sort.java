@@ -18,26 +18,32 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel(value="sort对象", description="类型")
 public class Sort {
 
-    /**
-     * 主键id
-     */
+	/**
+	 * 主键id
+	 */
 	@TableId(value = "id", type = IdType.AUTO)
 	@ApiModelProperty(value = "主键id")
 	private Integer id;
-    /**
-     * 分类
-     */
+	/**
+	 * 分类
+	 */
 	@ApiModelProperty(value = "分类")
 	private String sortName;
-    /**
-     * 创建时间
-     */
+	/**
+	 * 创建时间
+	 */
 	@ApiModelProperty(value = "创建时间")
 	private String createTime;
-    /**
-     * 更新时间
-     */
+	/**
+	 * 更新时间
+	 */
 	@ApiModelProperty(value = "更新时间")
 	private String updateTime;
 
+	/**
+	 * 药品数量（不映射数据库字段）
+	 */
+	@TableField(exist = false)
+	@ApiModelProperty(value = "药品数量")
+	private Integer drugCount;
 }
