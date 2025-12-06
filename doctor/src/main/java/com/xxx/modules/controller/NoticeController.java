@@ -34,17 +34,17 @@ public class NoticeController {
     private NoticeService noticeService;
 
     /**
-    *  获取所有公告
-    * @param pageNum
-    * @param pageSize
-    * @param notice
-    * @return
-    */
+     *  获取所有公告
+     * @param pageNum
+     * @param pageSize
+     * @param notice
+     * @return
+     */
 
     @GetMapping("/getNoticeList")
     @ApiOperation("获取所有公告")
     public Result<?> getNoticeList(Notice notice, @RequestParam(value="pageNum",defaultValue = "1") Integer pageNum,
-                                      @RequestParam(value="pageSize",defaultValue = "10") Integer pageSize){
+                                   @RequestParam(value="pageSize",defaultValue = "10") Integer pageSize){
         return noticeService.selectNoticeList(notice,pageNum,pageSize);
     }
 
@@ -56,10 +56,10 @@ public class NoticeController {
     }
 
     /**
-    * 保存公告
-    * @param notice
-    * @return
-    */
+     * 保存公告
+     * @param notice
+     * @return
+     */
     @PostMapping("/saveNoticeInfo")
     @ApiOperation("保存公告")
     public Result<?> saveNoticeInfo(@RequestBody Notice notice){
@@ -101,7 +101,33 @@ public class NoticeController {
         return noticeService.delBatchNoticeInfo(idList);
     }
 
+    /**
+     * 查询公告列表（支持科室筛选）- 新接口
+     */
+    @GetMapping("/getNoticeListWithDept")
+    public Result<?> getNoticeListWithDept(
+            @RequestParam(required = false) Integer deptId,
+            @RequestParam(required = false) String title,
+            @RequestParam(defaultValue = "1") Integer pageNum,
+            @RequestParam(defaultValue = "10") Integer pageSize) {
+        return noticeService.selectNoticeListWithDept(deptId, title, pageNum, pageSize);
+    }
 
+    /**
+     * 查询公告详情（包含科室名称）- 新接口
+     */
+    @GetMapping("/getNoticeInfoWithDept/{id}")
+    public Result<?> getNoticeInfoWithDept(@PathVariable Integer id) {
+        return noticeService.selectNoticeInfoWithDept(id);
+    }
+
+    /**
+     * 根据科室查询公告列表 - 新接口
+     */
+    @GetMapping("/getNoticeListByDeptId/{deptId}")
+    public Result<?> getNoticeListByDeptId(@PathVariable Integer deptId) {
+        return noticeService.selectNoticeListByDeptId(deptId);
+    }
 
 
 

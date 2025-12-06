@@ -56,7 +56,31 @@ public interface NoticeService extends IService<Notice>{
      * @return
      */
     Result<?> delBatchNoticeInfo(String idList);
+// ========== 新增方法 ==========
 
+    /**
+     * 获取公告列表（包含科室信息，支持科室筛选）
+     * @param deptId 科室ID（可为null）
+     * @param title 标题（可为null）
+     * @param pageNum 页码
+     * @param pageSize 每页条数
+     * @return 公告列表
+     */
+    Result<?> selectNoticeListWithDept(Integer deptId, String title, Integer pageNum, Integer pageSize);
+
+    /**
+     * 获取单个公告详情（包含科室名称）
+     * @param id 公告ID
+     * @return 公告详情
+     */
+    Result<?> selectNoticeInfoWithDept(Integer id);
+
+    /**
+     * 根据科室ID查询公告列表
+     * @param deptId 科室ID
+     * @return 公告列表
+     */
+    Result<?> selectNoticeListByDeptId(Integer deptId);
 
 
 
