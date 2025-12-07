@@ -45,7 +45,7 @@ public class EvaluateServiceImpl extends ServiceImpl<EvaluateMapper, Evaluate> i
     public Result<?> selectEvaluateList(Evaluate evaluate, Integer pageNum, Integer pageSize) {
         PageHelper.startPage(pageNum,pageSize);
         List<Evaluate> data = evaluateMapper.selectListInfo(evaluate);
-       return ResultUtil.success(1,"成功",new PageInfo<>(data));
+        return ResultUtil.success(1,"成功",new PageInfo<>(data));
     }
 
 
@@ -71,7 +71,7 @@ public class EvaluateServiceImpl extends ServiceImpl<EvaluateMapper, Evaluate> i
     @Override
     public Result<?> saveEvaluateInfo(Evaluate evaluate) {
         QueryWrapper<Order> wrapper = new QueryWrapper<>();
-        wrapper.eq("user_id",evaluate.getUserId()).eq("doctor_user_id",evaluate.getDoctorUserId()).eq("status",2);
+        wrapper.eq("user_id",evaluate.getUserId()).eq("doctor_user_id",evaluate.getDoctorUserId()).eq("status",3);
         Integer count = orderMapper.selectCount(wrapper);
         if (count == null || count == 0){
             return ResultUtil.error(-1,"你还未挂号过该医生");
@@ -80,7 +80,7 @@ public class EvaluateServiceImpl extends ServiceImpl<EvaluateMapper, Evaluate> i
         evaluate.setUpdateTime(TimeUtil.getCurrentTime());
         evaluateMapper.insert(evaluate);
         return ResultUtil.success(1,"成功",null);
-}
+    }
 
     /**
      * 更新评论接口实现类
