@@ -1,0 +1,1 @@
+import{aY as e}from"./index-DHWM4oWl.js";const o=a=>e({url:"/common/evaluate/getEvaluateList",method:"get",params:a}),s=a=>e({url:"/common/evaluate/saveEvaluateInfo",method:"post",data:a});export{o as g,s};

@@ -96,7 +96,7 @@ public class UploadController {
                 return  ResultUtil.error(-1,"路径为空");
             } catch (IOException e) {
                 e.printStackTrace();
-                log.info("上传底图接口/uploadBaseImage出现异常,异常信息如下====>{}",e.getMessage());
+//                log.info("上传底图接口/uploadBaseImage出现异常,异常信息如下====>{}",e.getMessage());
                 return  ResultUtil.error(-1,"上传文件异常");
             }
         }

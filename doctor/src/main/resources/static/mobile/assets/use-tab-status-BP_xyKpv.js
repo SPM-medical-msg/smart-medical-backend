@@ -1,0 +1,1 @@
+import{b as c,be as l,bf as n,bg as a,c as r}from"./index-DHWM4oWl.js";function v(){const s=c([]),e=[];return l(()=>{s.value=[]}),[s,t=>(e[t]||(e[t]=u=>{s.value[t]=u}),e[t])]}const b=Symbol(),o=Symbol(),f=()=>n(o,null),A=s=>{const e=f();a(b,s),a(o,r(()=>(e==null||e.value)&&s.value))};export{A as a,f as b,v as u};

@@ -81,20 +81,18 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         if (!checkIsFriend(patientId, doctorId)) {
             // 不是好友，自动建立双向好友关系
             createFriendRelation(patientId, doctorId);
-
-            // 发送MQTT通知给医生：有新患者
-            User patient = userMapper.selectById(patientId);
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("msg", "您有新的患者咨询，患者：" + patient.getRealName());
-            jsonObject.put("type", "NEW_PATIENT");
-            jsonObject.put("patientId", patientId);
-            jsonObject.put("orderId", orderFromDb.getId());
-            mqttGateway.sendToMqtt("ADD/APPLY/" + doctorId, jsonObject.toString());
         }
-
-        // 发送MQTT通知给患者：支付成功，可以开始咨询
+        // 发送MQTT通知给医生：有新患者
+//        User patient = userMapper.selectById(patientId);
+//        JSONObject jsonObject = new JSONObject();
+//        jsonObject.put("msg", "您有新的患者咨询，患者：" + patient.getRealName());
+//        jsonObject.put("type", "NEW_PATIENT");
+//        jsonObject.put("patientId", patientId);
+//        jsonObject.put("orderId", orderFromDb.getId());
+//        mqttGateway.sendToMqtt("NEW/" + doctorId, jsonObject.toString());
+//        // 发送MQTT通知给患者：支付成功，可以开始咨询
 //        JSONObject patientNotify = new JSONObject();
-//        patientNotify.put("msg", "支付成功，咨询通道已建立");
+//        patientNotify.put("msg", "咨询通道已建立");
 //        patientNotify.put("type", "PAY_SUCCESS");
 //        patientNotify.put("doctorId", doctorId);
 //        patientNotify.put("orderId", orderFromDb.getId());

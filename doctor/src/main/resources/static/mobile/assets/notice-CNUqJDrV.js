@@ -1,0 +1,1 @@
+import{aY as e}from"./index-DHWM4oWl.js";const i=t=>e({url:"/common/notice/getNoticeInfo",method:"get",params:t}),r=t=>e({url:"/common/notice/getNoticeListWithDept",method:"get",params:t});export{i as a,r as g};

@@ -1,0 +1,832 @@
+================================================================================
+                    前台患者系统接口文档
+            患者对话框、咨询订单、诊断方案
+================================================================================
+
+【项目总述】
+本文档定义了医疗系统前台患者端的对话框、订单咨询、诊断方案等功能的接口规范。
+包括患者与医生的聊天、订单查询、诊断方案查看等功能。
+
+================================================================================
+                      第一部分：患者对话框接口
+================================================================================
+
+【基础URL】
+http://localhost:8080/common/friendMessage
+
+【1.1】获取聊天记录
+接口名称：获取患者对应的聊天记录
+请求方式：GET
+请求路径：/getFriendMessageInfo
+请求参数：
+  - pageNum (可选)：页码，默认值为1，类型：Integer
+  - pageSize (可选)：每页数量，默认值为120，类型：Integer
+  - sendUserId (必需)：发送者用户ID，类型：Integer
+  - receiveUserId (必需)：接收者用户ID，类型：Integer
+
+请求示例：
+GET /common/friendMessage/getFriendMessageInfo?pageNum=1&pageSize=120&sendUserId=40&receiveUserId=6
+
+响应示例：
+{
+  "code": 1,
+  "msg": "成功",
+  "data": {
+    "pageNum": 1,
+    "pageSize": 120,
+    "size": 16,
+    "startRow": 1,
+    "endRow": 16,
+    "total": 16,
+    "pages": 1,
+    "list": [
+      {
+        "id": 465,
+        "sendUserId": 6,
+        "receiveUserId": 40,
+        "content": "11111111",
+        "type": 1,
+        "status": 1,
+        "createTime": "2025-11-15 09:32:44",
+        "updateTime": "2025-11-15 09:32:44",
+        "sendRealName": "超管1",
+        "imageUrl": "https://gulimall-psw.oss-cn-hangzhou.aliyuncs.com/...",
+        "receiveRealName": "张军",
+        "fileUrl": null,
+        "isView": 2,
+        "strategyId": null
+      },
+      {
+        "id": 466,
+        "sendUserId": 40,
+        "receiveUserId": 6,
+        "content": "1111111111",
+        "type": 1,
+        "status": 1,
+        "createTime": "2025-11-15 09:33:57",
+        "updateTime": "2025-11-15 09:33:57",
+        "sendRealName": "张军",
+        "imageUrl": "https://gulimall-psw.oss-cn-hangzhou.aliyuncs.com/...",
+        "receiveRealName": "超管1",
+        "fileUrl": null,
+        "isView": 2,
+        "strategyId": null
+      },
+      {
+        "id": 515,
+        "sendUserId": 6,
+        "receiveUserId": 40,
+        "content": "患者已结束咨询",
+        "type": 99,
+        "status": 1,
+        "createTime": "2025-11-17 17:11:06",
+        "updateTime": "2025-11-17 17:11:06",
+        "sendRealName": "超管1",
+        "imageUrl": "https://gulimall-psw.oss-cn-hangzhou.aliyuncs.com/...",
+        "receiveRealName": "张军",
+        "fileUrl": null,
+        "isView": 2,
+        "strategyId": 47
+      }
+    ]
+  }
+}
+
+字段说明：
+  - id：消息ID
+  - sendUserId：发送者用户ID
+  - receiveUserId：接收者用户ID
+  - content：消息内容
+  - type：消息类型（1-文本，99-系统消息）
+  - status：消息状态（1-已发送）
+  - createTime：创建时间
+  - updateTime：更新时间
+  - sendRealName：发送者真实姓名
+  - imageUrl：发送者头像URL
+  - receiveRealName：接收者真实姓名
+  - fileUrl：文件URL（如果有附件）
+  - isView：是否已查看（1-未查看，2-已查看）
+  - strategyId：诊断方案ID（关联的诊断方案）
+
+---
+
+【1.2】发送消息
+接口名称：保存好友消息
+请求方式：POST
+请求路径：/saveFriendMessageInfo
+请求体：JSON格式
+  {
+    "sendUserId": 发送者用户ID,
+    "receiveUserId": 接收者用户ID,
+    "content": "消息内容",
+    "type": 消息类型,
+    "fileUrl": "文件URL（可选）",
+    "strategyId": 诊断方案ID（可选）
+  }
+
+消息类型说明：
+  - 1：文本消息
+  - 99：系统消息
+
+请求示例：
+POST /common/friendMessage/saveFriendMessageInfo
+Content-Type: application/json
+
+{
+  "sendUserId": 40,
+  "receiveUserId": 6,
+  "content": "您好，请问有什么我可以帮助您的吗？",
+  "type": 1
+}
+
+响应示例：
+{
+  "code": 1,
+  "msg": "成功",
+  "data": null
+}
+
+---
+
+【1.3】发送文件消息
+接口名称：保存好友消息（带文件）
+请求方式：POST
+请求路径：/saveFriendMessageInfo
+请求体：JSON格式
+  {
+    "sendUserId": 发送者用户ID,
+    "receiveUserId": 接收者用户ID,
+    "content": "[文件]",
+    "type": 1,
+    "fileUrl": "文件URL"
+  }
+
+请求示例：
+POST /common/friendMessage/saveFriendMessageInfo
+Content-Type: application/json
+
+{
+  "sendUserId": 40,
+  "receiveUserId": 6,
+  "content": "[文件]",
+  "type": 1,
+  "fileUrl": "https://gulimall-psw.oss-cn-hangzhou.aliyuncs.com/path/to/file.pdf"
+}
+
+响应示例：
+{
+  "code": 1,
+  "msg": "成功",
+  "data": null
+}
+
+---
+
+【1.4】更新消息状态
+接口名称：更新好友消息
+请求方式：PUT
+请求路径：/updateFriendMessageInfo
+请求体：JSON格式
+  {
+    "id": 消息ID,
+    "isView": 2
+  }
+
+请求示例：
+PUT /common/friendMessage/updateFriendMessageInfo
+Content-Type: application/json
+
+{
+  "id": 465,
+  "isView": 2
+}
+
+响应示例：
+{
+  "code": 1,
+  "msg": "成功",
+  "data": null
+}
+
+---
+
+【1.5】删除消息
+接口名称：根据id删除好友消息
+请求方式：DELETE
+请求路径：/delFriendMessageInfo
+请求参数：
+  - id (必需)：消息ID，类型：Integer
+
+请求示例：
+DELETE /common/friendMessage/delFriendMessageInfo?id=465
+
+响应示例：
+{
+  "code": 1,
+  "msg": "成功",
+  "data": null
+}
+
+---
+
+【1.6】批量删除消息
+接口名称：根据id集合批量删除好友消息
+请求方式：DELETE
+请求路径：/delBatchFriendMessageInfo
+请求参数：
+  - idList (必需)：消息ID列表，多个ID用逗号分隔，类型：String
+
+请求示例：
+DELETE /common/friendMessage/delBatchFriendMessageInfo?idList=465,466,467
+
+响应示例：
+{
+  "code": 1,
+  "msg": "成功",
+  "data": null
+}
+
+================================================================================
+                      第二部分：患者订单咨询接口
+================================================================================
+
+【基础URL】
+http://localhost:8080/common/order
+
+【2.1】患者创建咨询订单
+接口名称：患者创建订单
+请求方式：POST
+请求路径：/saveOrderInfo
+请求体：JSON格式
+  {
+    "userId": 患者用户ID,
+    "doctorUserId": 医生用户ID
+  }
+
+请求示例：
+POST /common/order/saveOrderInfo
+Content-Type: application/json
+
+{
+  "userId": 46,
+  "doctorUserId": 40
+}
+
+响应示例：
+{
+  "code": 1,
+  "msg": "订单创建成功",
+  "data": {
+    "orderNumber": "202511193183597817",
+    "createTime": "2025-11-19 19:21:58",
+    "price": 0.0,
+    "id": 63,
+    "time": 4
+  }
+}
+
+字段说明：
+  - orderNumber：订单编号
+  - createTime：订单创建时间
+  - price：咨询费用
+  - id：订单ID
+  - time：时间段
+
+---
+
+【2.2】患者支付订单
+接口名称：患者支付订单
+请求方式：POST
+请求路径：/payOrderInfo
+请求体：JSON格式
+  {
+    "orderNumber": "订单编号",
+    "createTime": "创建时间",
+    "price": 支付金额,
+    "id": 订单ID,
+    "time": 时间段,
+    "doctorRealName": "医生名称",
+    "deptName": "科室名称",
+    "majorInfo": "专业方向",
+    "doctorAvatar": "医生头像URL",
+    "status": 1
+  }
+
+请求示例：
+POST /common/order/payOrderInfo
+Content-Type: application/json
+
+{
+  "orderNumber": "202511193183597817",
+  "createTime": "2025-11-19 19:21:58",
+  "price": 0,
+  "id": 63,
+  "time": 4,
+  "doctorRealName": "张军",
+  "deptName": "外科",
+  "majorInfo": "胃肠外科",
+  "doctorAvatar": "https://gulimall-psw.oss-cn-hangzhou.aliyuncs.com/2025-11-03//a6979b32-c830-44e5-8daf-df6a47034a11_医生 (14).jpg",
+  "status": 1
+}
+
+响应示例：
+{
+  "code": 1,
+  "msg": "正常",
+  "data": null
+}
+
+---
+
+【2.3】患者查看自己的订单列表
+接口名称：获取自己的订单列表
+请求方式：GET
+请求路径：/getUserOrderList
+请求参数：
+  - pageNum (可选)：页码，默认值为1，类型：Integer
+  - pageSize (可选)：每页数量，默认值为100，类型：Integer
+  - userId (必需)：患者用户ID，类型：Integer
+  - status (可选)：订单状态，类型：Integer
+
+订单状态说明：
+  - 1：待支付
+  - 2：等待医生联系
+  - 3：已完成
+  - 4：已退款/已取消
+
+请求示例：
+GET /common/order/getUserOrderList?pageNum=1&pageSize=100&userId=40&status=2
+
+响应示例：
+{
+  "code": 1,
+  "msg": "成功",
+  "data": {
+    "pageNum": 1,
+    "pageSize": 100,
+    "size": 3,
+    "startRow": 1,
+    "endRow": 3,
+    "total": 3,
+    "pages": 1,
+    "list": [
+      {
+        "id": 52,
+        "userId": 17,
+        "doctorUserId": 40,
+        "orderNumber": "202511157901585323",
+        "appointDay": "2025-11-15",
+        "weekDay": "星期六",
+        "time": 4,
+        "status": 2,
+        "price": 0.0,
+        "deptId": 8,
+        "createTime": "2025-11-15 19:39:50",
+        "updateTime": "2025-11-15 19:39:50",
+        "realName": "宵夜",
+        "doctorRealName": "张军",
+        "deptName": "外科",
+        "planId": null
+      },
+      {
+        "id": 51,
+        "userId": 52,
+        "doctorUserId": 40,
+        "orderNumber": "202511159556230422",
+        "appointDay": "2025-11-15",
+        "weekDay": "星期六",
+        "time": 4,
+        "status": 2,
+        "price": 0.0,
+        "deptId": 8,
+        "createTime": "2025-11-15 19:09:15",
+        "updateTime": "2025-11-15 19:09:15",
+        "realName": "手机用户15534445173",
+        "doctorRealName": "张军",
+        "deptName": "外科",
+        "planId": null
+      }
+    ]
+  }
+}
+
+字段说明：
+  - id：订单ID
+  - userId：患者用户ID
+  - doctorUserId：医生用户ID
+  - orderNumber：订单编号
+  - appointDay：预约日期
+  - weekDay：周几
+  - time：时间段
+  - status：订单状态
+  - price：费用
+  - deptId：科室ID
+  - createTime：创建时间
+  - updateTime：更新时间
+  - realName：患者真实姓名
+  - doctorRealName：医生真实姓名
+  - deptName：科室名称
+  - planId：诊断方案ID
+
+---
+
+【2.4】患者查看订单详情
+接口名称：根据id获取单个订单
+请求方式：GET
+请求路径：/getOrderInfo
+请求参数：
+  - id (必需)：订单ID，类型：Integer
+
+请求示例：
+GET /common/order/getOrderInfo?id=52
+
+响应示例：
+{
+  "code": 1,
+  "msg": "成功",
+  "data": {
+    "id": 52,
+    "userId": 17,
+    "doctorUserId": 40,
+    "orderNumber": "202511157901585323",
+    "appointDay": "2025-11-15",
+    "weekDay": "星期六",
+    "time": 4,
+    "status": 2,
+    "price": 0.0,
+    "deptId": 8,
+    "createTime": "2025-11-15 19:39:50",
+    "updateTime": "2025-11-15 19:39:50",
+    "realName": "宵夜",
+    "doctorRealName": "张军",
+    "deptName": "外科",
+    "planId": null
+  }
+}
+
+---
+
+【2.5】患者取消订单
+接口名称：修改订单状态（取消订单）
+请求方式：POST
+请求路径：/updateOrderStatus
+请求体：JSON格式
+  {
+    "orderId": 订单ID,
+    "status": 4
+  }
+
+请求示例：
+POST /common/order/updateOrderStatus
+Content-Type: application/json
+
+{
+  "orderId": 63,
+  "status": 4
+}
+
+响应示例：
+{
+  "code": 1,
+  "msg": "订单状态更新成功",
+  "data": null
+}
+
+================================================================================
+                      第三部分：诊断方案接口
+================================================================================
+
+【基础URL】
+http://localhost:8080/common/plan
+
+【3.1】获取诊断方案列表
+接口名称：获取所有排班/诊断方案
+请求方式：GET
+请求路径：/getPlanList
+请求参数：
+  - pageNum (可选)：页码，默认值为1，类型：Integer
+  - pageSize (可选)：每页数量，默认值为10，类型：Integer
+  - userId (可选)：用户ID，类型：Integer
+  - doctorUserId (可选)：医生用户ID，类型：Integer
+  - status (可选)：状态，类型：Integer
+
+请求示例：
+GET /common/plan/getPlanList?pageNum=1&pageSize=10&doctorUserId=40
+
+响应示例：
+{
+  "code": 1,
+  "msg": "成功",
+  "data": {
+    "pageNum": 1,
+    "pageSize": 10,
+    "size": 5,
+    "total": 5,
+    "pages": 1,
+    "list": [
+      {
+        "id": 1,
+        "userId": 17,
+        "doctorUserId": 40,
+        "planName": "诊断方案1",
+        "planContent": "详细的诊断方案内容",
+        "status": 1,
+        "createTime": "2025-11-15 19:39:50",
+        "updateTime": "2025-11-15 19:39:50"
+      }
+    ]
+  }
+}
+
+---
+
+【3.2】获取诊断方案详情
+接口名称：根据id获取单个诊断方案
+请求方式：GET
+请求路径：/getPlanInfo
+请求参数：
+  - id (必需)：诊断方案ID，类型：Integer
+
+请求示例：
+GET /common/plan/getPlanInfo?id=1
+
+响应示例：
+{
+  "code": 1,
+  "msg": "成功",
+  "data": {
+    "id": 1,
+    "userId": 17,
+    "doctorUserId": 40,
+    "planName": "诊断方案1",
+    "planContent": "详细的诊断方案内容",
+    "status": 1,
+    "createTime": "2025-11-15 19:39:50",
+    "updateTime": "2025-11-15 19:39:50"
+  }
+}
+
+---
+
+【3.3】医生创建诊断方案
+接口名称：保存诊断方案
+请求方式：POST
+请求路径：/savePlanInfo
+请求体：JSON格式
+  {
+    "userId": 患者用户ID,
+    "doctorUserId": 医生用户ID,
+    "planName": "方案名称",
+    "planContent": "方案详细内容",
+    "status": 1
+  }
+
+请求示例：
+POST /common/plan/savePlanInfo
+Content-Type: application/json
+
+{
+  "userId": 17,
+  "doctorUserId": 40,
+  "planName": "胃肠疾病诊断方案",
+  "planContent": "根据患者的症状和检查结果，建议进行以下治疗方案：\n1. 口服药物治疗\n2. 定期复查\n3. 饮食调理",
+  "status": 1
+}
+
+响应示例：
+{
+  "code": 1,
+  "msg": "成功",
+  "data": null
+}
+
+---
+
+【3.4】医生更新诊断方案
+接口名称：更新诊断方案
+请求方式：PUT
+请求路径：/updatePlanInfo
+请求体：JSON格式
+  {
+    "id": 诊断方案ID,
+    "planName": "新的方案名称",
+    "planContent": "更新的方案内容",
+    "status": 1
+  }
+
+请求示例：
+PUT /common/plan/updatePlanInfo
+Content-Type: application/json
+
+{
+  "id": 1,
+  "planName": "胃肠疾病诊断方案（更新）",
+  "planContent": "根据最新检查结果，调整治疗方案...",
+  "status": 1
+}
+
+响应示例：
+{
+  "code": 1,
+  "msg": "成功",
+  "data": null
+}
+
+---
+
+【3.5】删除诊断方案
+接口名称：根据id删除诊断方案
+请求方式：DELETE
+请求路径：/delPlanInfo
+请求参数：
+  - id (必需)：诊断方案ID，类型：Integer
+
+请求示例：
+DELETE /common/plan/delPlanInfo?id=1
+
+响应示例：
+{
+  "code": 1,
+  "msg": "成功",
+  "data": null
+}
+
+---
+
+【3.6】批量删除诊断方案
+接口名称：根据id集合批量删除诊断方案
+请求方式：DELETE
+请求路径：/delBatchPlanInfo
+请求参数：
+  - idList (必需)：诊断方案ID列表，多个ID用逗号分隔，类型：String
+
+请求示例：
+DELETE /common/plan/delBatchPlanInfo?idList=1,2,3
+
+响应示例：
+{
+  "code": 1,
+  "msg": "成功",
+  "data": null
+}
+
+================================================================================
+                      第四部分：患者好友关系接口
+================================================================================
+
+【基础URL】
+http://localhost:8080/common/friend
+
+【4.1】患者提出咨询申请（加医生好友）
+接口名称：患者提出咨询申请
+请求方式：POST
+请求路径：/saveFriendInfo
+请求体：JSON格式
+  {
+    "userId": 患者用户ID,
+    "friendId": 医生用户ID,
+    "applyMessage": "咨询申请信息（可选）"
+  }
+
+请求示例：
+POST /common/friend/saveFriendInfo
+Content-Type: application/json
+
+{
+  "userId": 46,
+  "friendId": 40,
+  "applyMessage": "我想咨询一下关于胃肠的问题"
+}
+
+响应示例：
+{
+  "code": 1,
+  "msg": "成功",
+  "data": null
+}
+
+---
+
+【4.2】患者查看医生信息
+接口名称：获取医生信息
+请求方式：GET
+请求路径：/getFriendInfoById
+请求参数：
+  - userId (必需)：患者用户ID，类型：Integer
+  - friendId (必需)：医生用户ID，类型：Integer
+
+请求示例：
+GET /common/friend/getFriendInfoById?userId=46&friendId=50
+
+响应示例：
+{
+  "code": 1,
+  "msg": "成功",
+  "data": {
+    "id": 145,
+    "userId": 46,
+    "friendId": 50,
+    "realName": "杨朝伟",
+    "imageUrl": "https://gulimall-psw.oss-cn-hangzhou.aliyuncs.com/...",
+    "createTime": "2025-11-17 17:13:29",
+    "updateTime": "2025-11-17 18:45:49",
+    "newMessage": "[图片]",
+    "type": 1,
+    "status": 2,
+    "sex": 1,
+    "userName": "yangchaowei",
+    "activeAddUserId": 46,
+    "acceptAddUserId": 50,
+    "friendType": 1
+  }
+}
+
+---
+
+【4.3】患者删除医生好友
+接口名称：根据id删除好友
+请求方式：DELETE
+请求路径：/delFriendInfo
+请求参数：
+  - id (必需)：好友关系ID，类型：Integer
+
+请求示例：
+DELETE /common/friend/delFriendInfo?id=145
+
+响应示例：
+{
+  "code": 1,
+  "msg": "成功",
+  "data": null
+}
+
+================================================================================
+                            通用说明
+================================================================================
+
+【响应格式】
+所有接口的响应格式统一为：
+{
+  "code": 响应码(1表示成功),
+  "msg": "响应信息",
+  "data": 响应数据,
+  "baseUrl": null
+}
+
+【状态码说明】
+- code = 1：请求成功
+- code != 1：请求失败
+
+【时间格式】
+所有时间字段统一使用格式：YYYY-MM-DD HH:mm:ss
+
+【分页参数说明】
+- pageNum：页码，从1开始
+- pageSize：每页数量
+- total：总记录数
+- pages：总页数
+- list：当前页数据列表
+
+【订单状态说明】
+- 1：待支付
+- 2：等待医生联系
+- 3：已完成
+- 4：已退款/已取消
+
+【消息类型说明】
+- 1：文本消息
+- 99：系统消息（如"患者已结束咨询"）
+
+【消息查看状态说明】
+- 1：未查看
+- 2：已查看
+
+【时间段说明】
+- 1：08:00-10:00
+- 2：10:00-12:00
+- 3：14:00-16:00
+- 4：16:00-18:00
+
+【好友关系状态说明】
+- 1：申请中
+- 2：已通过（已成为好友）
+- 3：已拒绝
+- 4：已忽略
+
+【使用流程示例】
+
+1. 患者查看医生列表并选择医生
+2. 患者提出咨询申请 → POST /common/friend/saveFriendInfo
+3. 医生同意申请（后台处理）
+4. 患者创建订单 → POST /common/order/saveOrderInfo
+5. 患者支付订单 → POST /common/order/payOrderInfo
+6. 患者与医生开始对话 → POST /common/friendMessage/saveFriendMessageInfo
+7. 医生查看聊天记录 → GET /common/friendMessage/getFriendMessageInfo
+8. 医生创建诊断方案 → POST /common/plan/savePlanInfo
+9. 患者查看诊断方案 → GET /common/plan/getPlanInfo
+10. 患者查看订单状态 → GET /common/order/getUserOrderList
+
+================================================================================
+                          文档更新日期
+                        2025-11-20
+================================================================================

@@ -47,7 +47,6 @@ public class FriendMessageServiceImpl extends ServiceImpl<FriendMessageMapper, F
 
     /**
      * 获取好友消息接口实现类
-     * @param id
      * @return
      */
     @Override
